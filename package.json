@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/joopringelberg/perspectives-pageworker.git"
+    "url": "git+https://github.com/joopringelberg/perspectives-pageworker1.git"
   },
   "keywords": [
     "perspectives"
@@ -19,9 +19,9 @@
   "license": "MIT",
   "private": true,
   "bugs": {
-    "url": "https://github.com/joopringelberg/perspectives-pageworker/issues"
+    "url": "https://github.com/joopringelberg/perspectives-pageworker1/issues"
   },
-  "homepage": "https://github.com/joopringelberg/perspectives-pageworker#readme",
+  "homepage": "https://github.com/joopringelberg/perspectives-pageworker1#readme",
   "dependencies": {
     "perspectives-core": "git+https://github.com/joopringelberg/perspectives-core.git#v0.9.0",
     "perspectives-proxy": "git+https://github.com/joopringelberg/perspectives-proxy.git#v1.7.0"
