@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    pageWorker: "./src/page.js"
+    pageworker: "./src/page.js"
   },
   output: {
     library: 'perspectives-[name]',
@@ -44,7 +44,16 @@ module.exports = {
       root: "url"
     },
     "perspectives-core": {
-
+      commonjs: "perspectives-core",
+      commonjs2: "perspectives-core",
+      amd: "perspectives-core",
+      root: "perspectives-core"
+    },
+    "perspectives-proxy": {
+      commonjs: 'perspectives-proxy',
+      commonjs2: 'perspectives-proxy',
+      amd: 'perspectives-proxy',
+      root: 'perspectives-proxy'
     }
   }
 };

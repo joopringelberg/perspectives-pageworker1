@@ -2,7 +2,7 @@
   "name": "perspectives-pageworker",
   "version": "0.0.0",
   "description": "A 'worker' that actually runs in a webpage, simulating the SharedWorker used in browsers that support it.",
-  "main": "dist/perspectives-serviceworker.js",
+  "main": "dist/perspectives-pageworker.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",

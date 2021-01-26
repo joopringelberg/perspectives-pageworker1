@@ -39,7 +39,7 @@ let channelIndex = 1;
 //// RECEIVE PORTS FROM CLIENTS WHEN RUN IN THE MAIN PAGE, RELAYED THROUGH A SERVICE WORKER
 //// This function is passed on by the client in the call configurePDRProxy({pageHostingPDRPort: pageHostingPDRPort})
 ////////////////////////////////////////////////////////////////////////////////
-function pageHostingPDRPort()
+export default function pageHostingPDRPort()
 {
   // Create a channel.
   const channel = new MessageChannel();
@@ -63,15 +63,21 @@ function pageHostingPDRPort()
           }
           if (serviceWorker)
           {
-            // Send the port to the serviceWorker, to relay it to the page hosting the PDR.
-            navigator.serviceWorker.controller.postMessage({messageType: "relayPort", port: channel.port2});
-
             // Listen to messages coming in from the serviceWorker.
+            // Notice that all pages that are not the first will never handle a message.
             navigator.serviceWorker.addEventListener('message', function(event)
               {
                 switch (event.data.messageType){
                   case "youHost":
+                    // This message only arrives to the very first page visiting InPlace.
                     weHost = true;
+                    // We've sent ourselves a port.
+                    channels[ channelIndex ] = event.data.port;
+                    // Return the channelIndex.
+                    channels[ channelIndex ].postMessage( {serviceWorkerMessage: "channelId", channelId: 1000000 * channelIndex });
+                    // start listening to the new channel, handle requests.
+                    channels[ channelIndex ].onmessage = handleClientRequest;
+                    channelIndex = channelIndex + 1;
                     // This page must host the PDR.
                     PDRPromise = import("perspectives-core");
                     break;
@@ -83,13 +89,15 @@ function pageHostingPDRPort()
                       channels[ channelIndex ] = event.data.port;
                       // Return the channelIndex.
                       channels[ channelIndex ].postMessage( {serviceWorkerMessage: "channelId", channelId: 1000000 * channelIndex });
-                      channelIndex = channelIndex + 1;
                       // start listening to the new channel, handle requests.
                       channels[ channelIndex ].onmessage = handleClientRequest;
+                      channelIndex = channelIndex + 1;
                     }
                     break;
                 }
               });
+              // Send the port to the serviceWorker, to relay it to the page hosting the PDR.
+              navigator.serviceWorker.controller.postMessage({messageType: "relayPort", port: channel.port2}, [channel.port2]);
           }
           else
           {
@@ -180,7 +188,3 @@ function corrId2ChannelId (corrId)
 {
   return Math.floor(corrId / 1000000);
 }
-
-module.exports = {
-  pageHostingPDRPort: pageHostingPDRPort
-};
