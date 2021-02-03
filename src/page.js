@@ -139,7 +139,7 @@ function handleClientRequest( request )
           });
         break;
       case "authenticate":
-        PDRPromise.then( pdr => pdr.authenticate(req.username)(req.password)(req.host)(req.port)
+        PDRPromise.then( pdr => pdr.authenticate(req.username)(req.password)(req.host)(req.port)(req.publicRepo)
           (function(n) // (Int -> Effect Unit)
             {
               return function() //  This function is the result of the call to authenticate: the Effect.
@@ -150,7 +150,7 @@ function handleClientRequest( request )
             })()); // The core authenticate function results in an Effect, hence we apply it to return the (integer) result.
         break;
       case "resetAccount":
-        PDRPromise.then( pdr.resetAccount(req.username)(req.password)(req.host)(req.port)
+        PDRPromise.then( pdr.resetAccount(req.username)(req.password)(req.host)(req.port)(req.publicRepo)
           (function(success) // (Boolean -> Effect Unit)
             {
               return function() //  This function is the result of the call to resetAccount: the Effect.
