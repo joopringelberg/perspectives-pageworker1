@@ -138,27 +138,34 @@ function handleClientRequest( request )
             channels[corrId2ChannelId(req.channelId)].postMessage({serviceWorkerMessage: "isUserLoggedIn", isUserLoggedIn: true});
           });
         break;
-      case "authenticate":
-        PDRPromise.then( pdr => pdr.authenticate(req.username)(req.password)(req.host)(req.port)(req.publicRepo)
-          (function(n) // (Int -> Effect Unit)
-            {
-              return function() //  This function is the result of the call to authenticate: the Effect.
-              {
-                // Find the channel.
-                channels[corrId2ChannelId(req.channelId)].postMessage({serviceWorkerMessage: "authenticate", authenticationResult: n});
-              };
-            })()); // The core authenticate function results in an Effect, hence we apply it to return the (integer) result.
-        break;
       case "resetAccount":
-        PDRPromise.then( pdr.resetAccount(req.username)(req.password)(req.host)(req.port)(req.publicRepo)
+        PDRPromise.then( pdr.resetAccount(req.username)(req.password)(req.host)(req.port)(req.publicrepo)
           (function(success) // (Boolean -> Effect Unit)
             {
               return function() //  This function is the result of the call to resetAccount: the Effect.
               {
                 channels[corrId2ChannelId(req.channelId)].postMessage({serviceWorkerMessage: "resetAccount", resetSuccesful: success });
               };
-            })()); // The core authenticate function results in an Effect, hence we apply it to return the (boolean) result.
-
+            })()); // The core resetAccount function results in an Effect, hence we apply it to return the (boolean) result.
+        break;
+      case "runPDR":
+        // runPDR :: UserName -> Password -> PouchdbUser -> Url -> Effect Unit
+        try
+          {
+            runPDR( req.username) (req.password) (req.pouchdbuser) (req.publicrepo)
+            (function() // (Unit -> Effect Unit)
+            {
+              return function() // This function is the result of the call to runPDR: the Effect.
+              {
+                return {};
+              };
+            });
+          }
+          catch (e)
+          {
+            // Return the error message to the client.
+            channels[corrId2ChannelId(req.channelId)].postMessage({serviceWorkerMessage: "runPDR", error: e });
+          }
         break;
       case "close":
         InternalChannelPromise.then( ic => ic.close() );
