@@ -153,13 +153,15 @@ function handleClientRequest( request )
         try
           {
             runPDR( req.username) (req.password) (req.pouchdbuser) (req.publicrepo)
-            (function() // (Unit -> Effect Unit)
+            (function(success) // (Boolean -> Effect Unit), the callback.
             {
-              return function() // This function is the result of the call to runPDR: the Effect.
+              return function() // This function is the Effect that is returned.
               {
+                channels[corrId2ChannelId(req.channelId)].postMessage({serviceWorkerMessage: "runPDR", startSuccesful: success });
                 return {};
               };
-            });
+            })();
+          break;
           }
           catch (e)
           {
