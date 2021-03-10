@@ -139,7 +139,7 @@ function handleClientRequest( request )
           });
         break;
       case "resetAccount":
-        PDRPromise.then( pdr.resetAccount(req.username)(req.password)(req.host)(req.port)(req.publicrepo)
+        PDRPromise.then( pdr.resetAccount(req.username) (req.pouchdbuser) (req.publicrepo)
           (function(success) // (Boolean -> Effect Unit)
             {
               return function() //  This function is the result of the call to resetAccount: the Effect.
@@ -148,11 +148,21 @@ function handleClientRequest( request )
               };
             })()); // The core resetAccount function results in an Effect, hence we apply it to return the (boolean) result.
         break;
+      case "createAccount":
+        PDRPromise.then( pdr.createAccount(req.username) (req.pouchdbuser) (req.publicrepo)
+          (function(success) // (Boolean -> Effect Unit)
+            {
+              return function() //  This function is the result of the call to createAccount: the Effect.
+              {
+                channels[corrId2ChannelId(req.channelId)].postMessage({serviceWorkerMessage: "createAccount", createSuccesful: success });
+              };
+            })(); // The core createAccount function results in an Effect, hence we apply it to return the (boolean) result.
+        break;
       case "runPDR":
         // runPDR :: UserName -> Password -> PouchdbUser -> Url -> Effect Unit
         try
           {
-            runPDR( req.username) (req.password) (req.pouchdbuser) (req.publicrepo)
+            runPDR( req.username) (req.pouchdbuser) (req.publicrepo)
             (function(success) // (Boolean -> Effect Unit), the callback.
             {
               return function() // This function is the Effect that is returned.
