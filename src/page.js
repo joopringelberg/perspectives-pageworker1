@@ -18,15 +18,12 @@
 // Full text of this license can be found in the LICENSE file in the projects root.
 // END LICENSE
 
+import handleClientRequest from "sharedworker/perspectives-handleclientrequest.js";
+
 ////////////////////////////////////////////////////////////////////////////////
 //// PERSPECTIVES DISTRIBUTED RUNTIME
 ////////////////////////////////////////////////////////////////////////////////
 let PDRPromise;
-
-////////////////////////////////////////////////////////////////////////////////
-//// INTERNAL CHANNEL
-////////////////////////////////////////////////////////////////////////////////
-import {InternalChannelPromise} from "perspectives-proxy";
 
 ////////////////////////////////////////////////////////////////////////////////
 //// STORING PORTS SENT BY CLIENT PAGES
@@ -76,7 +73,7 @@ export default function pageHostingPDRPort()
                     // Return the channelIndex.
                     channels[ channelIndex ].postMessage( {serviceWorkerMessage: "channelId", channelId: 1000000 * channelIndex });
                     // start listening to the new channel, handle requests.
-                    channels[ channelIndex ].onmessage = handleClientRequest;
+                    channels[ channelIndex ].onmessage = request => handleClientRequest( channels, request );
                     channelIndex = channelIndex + 1;
                     // This page must host the PDR.
                     PDRPromise = import("perspectives-core");
@@ -90,7 +87,7 @@ export default function pageHostingPDRPort()
                       // Return the channelIndex.
                       channels[ channelIndex ].postMessage( {serviceWorkerMessage: "channelId", channelId: 1000000 * channelIndex });
                       // start listening to the new channel, handle requests.
-                      channels[ channelIndex ].onmessage = handleClientRequest;
+                      channels[ channelIndex ].onmessage = request => handleClientRequest( channels, request );
                       channelIndex = channelIndex + 1;
                     }
                     break;
@@ -116,94 +113,4 @@ export default function pageHostingPDRPort()
   }
   // Use port1 in the SharedWorkerChannel.
   return channel.port1;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-//// HANDLE REQUESTS COMING IN THROUGH CHANNELS FROM CLIENTS
-////////////////////////////////////////////////////////////////////////////////
-// These calls are implemented in accordance with the types of the functions in the core.
-// The callbacks are declared as Effects, there, hence we treat them here that way.
-// We could cheat and provide callbacks that do not return an Effect.
-function handleClientRequest( request )
-{
-  const req = request.data;
-  if (req.proxyRequest)
-  {
-    switch (req.proxyRequest)
-    {
-      case "isUserLoggedIn":
-        //{proxyRequest: "isUserLoggedIn", channelId: proxy.channelId}
-        InternalChannelPromise.then( function ()
-          {
-            channels[corrId2ChannelId(req.channelId)].postMessage({serviceWorkerMessage: "isUserLoggedIn", isUserLoggedIn: true});
-          });
-        break;
-      case "resetAccount":
-        PDRPromise.then( pdr.resetAccount(req.username) (req.pouchdbuser) (req.publicrepo)
-          (function(success) // (Boolean -> Effect Unit)
-            {
-              return function() //  This function is the result of the call to resetAccount: the Effect.
-              {
-                channels[corrId2ChannelId(req.channelId)].postMessage({serviceWorkerMessage: "resetAccount", resetSuccesful: success });
-              };
-            })()); // The core resetAccount function results in an Effect, hence we apply it to return the (boolean) result.
-        break;
-      case "createAccount":
-        PDRPromise.then( pdr.createAccount(req.username) (req.pouchdbuser) (req.publicrepo)
-          (function(success) // (Boolean -> Effect Unit)
-            {
-              return function() //  This function is the result of the call to createAccount: the Effect.
-              {
-                channels[corrId2ChannelId(req.channelId)].postMessage({serviceWorkerMessage: "createAccount", createSuccesful: success });
-              };
-            })(); // The core createAccount function results in an Effect, hence we apply it to return the (boolean) result.
-        break;
-      case "runPDR":
-        // runPDR :: UserName -> Password -> PouchdbUser -> Url -> Effect Unit
-        try
-          {
-            runPDR( req.username) (req.pouchdbuser) (req.publicrepo)
-            (function(success) // (Boolean -> Effect Unit), the callback.
-            {
-              return function() // This function is the Effect that is returned.
-              {
-                channels[corrId2ChannelId(req.channelId)].postMessage({serviceWorkerMessage: "runPDR", startSuccesful: success });
-                return {};
-              };
-            })();
-          break;
-          }
-          catch (e)
-          {
-            // Return the error message to the client.
-            channels[corrId2ChannelId(req.channelId)].postMessage({serviceWorkerMessage: "runPDR", error: e });
-          }
-        break;
-      case "close":
-        InternalChannelPromise.then( ic => ic.close() );
-        break;
-      case "unsubscribe":
-        InternalChannelPromise.then( ic => ic.unsubscribe( req.request ) );
-        break;
-    }
-  }
-  else
-  {
-    // The callback was saved in the ServiceWorkerChannel.
-    // Replace the callback with a function that passes on the response to the right channel.
-    // The ServiceWorkerChannel will apply the callback.
-    req.reactStateSetter = function( result )
-      {
-        return function()
-        {
-          channels[corrId2ChannelId(result.corrId)].postMessage( result );
-        };
-      };
-    InternalChannelPromise.then( ic => ic.send( req ) );
-  }
-}
-
-function corrId2ChannelId (corrId)
-{
-  return Math.floor(corrId / 1000000);
 }

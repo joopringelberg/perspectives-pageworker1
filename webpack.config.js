@@ -13,6 +13,11 @@ module.exports = {
   watch: false,
   mode: "development",
   target: "webworker",
+  resolve: {
+      alias: {
+        sharedworker: path.resolve(__dirname, 'node_modules/perspectives-sharedworker/dist')
+      },
+    },
   module: {
     rules: [{
         test: /.js?$/,
