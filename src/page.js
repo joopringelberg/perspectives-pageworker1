@@ -93,8 +93,8 @@ export default function pageHostingPDRPort()
                     break;
                 }
               });
-              // Send the port to the serviceWorker, to relay it to the page hosting the PDR.
-              navigator.serviceWorker.controller.postMessage({messageType: "relayPort", port: channel.port2}, [channel.port2]);
+            // Send the port to the serviceWorker, to relay it to the page hosting the PDR.
+            navigator.serviceWorker.controller.postMessage({messageType: "relayPort", port: channel.port2}, [channel.port2]);
           }
           else
           {
