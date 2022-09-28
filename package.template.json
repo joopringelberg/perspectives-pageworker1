@@ -1,6 +1,6 @@
 {
   "name": "perspectives-pageworker",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "A 'worker' that actually runs in a webpage, simulating the SharedWorker used in browsers that support it.",
   "main": "dist/perspectives-pageworker.js",
   "scripts": {
