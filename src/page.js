@@ -18,6 +18,13 @@
 // Full text of this license can be found in the LICENSE file in the projects root.
 // END LICENSE
 
+// Notice that even though the method name "postMessage" equals that of Window.postMessage, here we deal
+// with MessagePort.postMessage and ServiceWorker.postMessage. These methods have a different interface.
+// See:
+// https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
+// https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker/postMessage
+// https://developer.mozilla.org/en-US/docs/Web/API/MessagePort/postMessage
+
 import handleClientRequest from "sharedworker/perspectives-handleclientrequest.js";
 
 ////////////////////////////////////////////////////////////////////////////////
