@@ -35,6 +35,7 @@ let PDRPromise;
 ////////////////////////////////////////////////////////////////////////////////
 //// STORING PORTS SENT BY CLIENT PAGES
 ////////////////////////////////////////////////////////////////////////////////
+// An array of MessageChannel ports.
 const channels = {};
 let channelIndex = 1;
 
@@ -42,6 +43,7 @@ let channelIndex = 1;
 //// PORT TO PAGE THAT HOSTS PDR
 //// RECEIVE PORTS FROM CLIENTS WHEN RUN IN THE MAIN PAGE, RELAYED THROUGH A SERVICE WORKER
 //// This function is passed on by the client in the call configurePDRProxy({pageHostingPDRPort: pageHostingPDRPort})
+//// This function returns a MessagePort as documented here: https://developer.mozilla.org/en-US/docs/Web/API/MessagePort.
 ////////////////////////////////////////////////////////////////////////////////
 export default function pageHostingPDRPort()
 {
@@ -89,7 +91,7 @@ export default function pageHostingPDRPort()
                     // If we are the host, save the port; otherwise ignore.
                     if (weHost)
                     {
-                      // the new client (page) sends a port.
+                      // the new client (page) sends a port. This is a MessagePort.
                       channels[ channelIndex ] = event.data.port;
                       // Return the channelIndex.
                       channels[ channelIndex ].postMessage( {serviceWorkerMessage: "channelId", channelId: 1000000 * channelIndex });
@@ -101,6 +103,7 @@ export default function pageHostingPDRPort()
                 }
               });
             // Send the port to the serviceWorker, to relay it to the page hosting the PDR.
+            // See: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker/postMessage
             navigator.serviceWorker.controller.postMessage({messageType: "relayPort", port: channel.port2}, [channel.port2]);
           }
           else
