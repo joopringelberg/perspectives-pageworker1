@@ -22,10 +22,12 @@
     "url": "https://github.com/joopringelberg/perspectives-pageworker1/issues"
   },
   "homepage": "https://github.com/joopringelberg/perspectives-pageworker1#readme",
-  "dependencies": {
+  "peerDependencies": {
     "perspectives-core": "git+https://github.com/joopringelberg/perspectives-core.git#PERSPECTIVESCORE",
     "perspectives-proxy": "git+https://github.com/joopringelberg/perspectives-proxy.git#PERSPECTIVESPROXY",
     "perspectives-sharedworker": "git+https://github.com/joopringelberg/perspectives-sharedworker.git#SHAREDWORKER"
+  },
+  "dependencies": {
   },
   "devDependencies": {
     "@babel/cli": "^7.12.1",
