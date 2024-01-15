@@ -54,7 +54,7 @@ export default function pageHostingPDRPort()
   if ('serviceWorker' in navigator)
   {
     navigator.serviceWorker.register(
-      'perspectives-serviceworker.js',
+      'perspectives-pagedispatcher.js',
       {
           scope: './'
       }).then(function (registration)
