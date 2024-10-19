@@ -1,6 +1,6 @@
 {
   "name": "perspectives-pageworker",
-  "version": "0.16.2",
+  "version": "0.16.3",
   "description": "A 'worker' that actually runs in a webpage, simulating the SharedWorker used in browsers that support it.",
   "main": "dist/perspectives-pageworker.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "peerDependencies": {
     "perspectives-core": "git+https://github.com/joopringelberg/perspectives-core.git#v0.26.1",
     "perspectives-proxy": "git+https://github.com/joopringelberg/perspectives-proxy.git#v1.21.1",
-    "perspectives-sharedworker": "git+https://github.com/joopringelberg/perspectives-sharedworker.git#v0.16.2"
+    "perspectives-sharedworker": "git+https://github.com/joopringelberg/perspectives-sharedworker.git#v0.16.3"
   },
   "dependencies": {
   },
