@@ -71,6 +71,7 @@ export default function pageHostingPDRPort()
           {
             // Listen to messages coming in from the serviceWorker.
             // Notice that all pages that are not the first will never handle a message.
+            // Notice that this handler is on the ServiceWorkerContainer of the page; NOT IN THE SERVICEWORKER ITSELF!
             navigator.serviceWorker.addEventListener('message', function(event)
               {
                 switch (event.data.messageType){
@@ -102,14 +103,25 @@ export default function pageHostingPDRPort()
                     break;
                 }
               });
-            // Send the port to the serviceWorker, to relay it to the page hosting the PDR.
-            // See: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker/postMessage
-            navigator.serviceWorker.controller.postMessage({messageType: "relayPort", port: channel.port2}, [channel.port2]);
+            if (navigator.serviceWorker.controller)
+            {
+              console.log("navigator heeft controler direct na registreren - stuur relayport nu.")
+              navigator.serviceWorker.controller.postMessage({messageType: "relayPort", port: channel.port2}, [channel.port2]);
+            }
           }
           else
           {
             console.log ("Could not get serviceWorker from registration for an unknown reason.");
           }
+          navigator.serviceWorker.addEventListener("controllerchange", () => {
+            // Send the port to the serviceWorker, to relay it to the page hosting the PDR.
+            // Only the serviceworker knows how many clients it has. If there is but one, it will immediately
+            // return a "youhost" message to this listener, which will set 'wehost' to true. 
+            // See: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker/postMessage
+            console.log("Controller change. Stuur relayport nu.")
+            navigator.serviceWorker.controller.postMessage({messageType: "relayPort", port: channel.port2}, [channel.port2]);
+          });          
+
         }).catch (function (error)
           {
             // Something went wrong during registration. The service-worker.js file
