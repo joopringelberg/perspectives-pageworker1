@@ -53,12 +53,6 @@ module.exports = {
       commonjs2: "perspectives-core",
       amd: "perspectives-core",
       root: "perspectives-core"
-    },
-    "perspectives-proxy": {
-      commonjs: 'perspectives-proxy',
-      commonjs2: 'perspectives-proxy',
-      amd: 'perspectives-proxy',
-      root: 'perspectives-proxy'
     }
   }
 };
