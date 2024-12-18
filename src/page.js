@@ -45,7 +45,7 @@ let channelIndex = 1;
 //// This function is passed on by the client in the call configurePDRProxy({pageHostingPDRPort: pageHostingPDRPort})
 //// This function returns a MessagePort as documented here: https://developer.mozilla.org/en-US/docs/Web/API/MessagePort.
 ////////////////////////////////////////////////////////////////////////////////
-export default function pageHostingPDRPort()
+export default function pageHostingPDRPort(pdr)
 {
   // Create a channel.
   const channel = new MessageChannel();
@@ -83,10 +83,9 @@ export default function pageHostingPDRPort()
                     // Return the channelIndex.
                     channels[ channelIndex ].postMessage( {serviceWorkerMessage: "channelId", channelId: 1000000 * channelIndex });
                     // start listening to the new channel, handle requests.
-                    channels[ channelIndex ].onmessage = request => handleClientRequest( channels, request );
-                    channelIndex = channelIndex + 1;
                     // This page must host the PDR.
-                    PDRPromise = import("perspectives-core");
+                    channels[ channelIndex ].onmessage = request => handleClientRequest( pdr, channels, request );
+                    channelIndex = channelIndex + 1;
                     break;
                   case "relayPort":
                     // If we are the host, save the port; otherwise ignore.
@@ -97,7 +96,7 @@ export default function pageHostingPDRPort()
                       // Return the channelIndex.
                       channels[ channelIndex ].postMessage( {serviceWorkerMessage: "channelId", channelId: 1000000 * channelIndex });
                       // start listening to the new channel, handle requests.
-                      channels[ channelIndex ].onmessage = request => handleClientRequest( channels, request );
+                      channels[ channelIndex ].onmessage = request => handleClientRequest( pdr, channels, request );
                       channelIndex = channelIndex + 1;
                     }
                     break;
