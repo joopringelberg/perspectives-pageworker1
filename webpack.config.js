@@ -1,23 +1,24 @@
-const path = require("path");
+import CopyPlugin from "copy-webpack-plugin";
+import { CleanWebpackPlugin } from "clean-webpack-plugin";
 
-module.exports = {
+export default {
   entry: {
-    pageworker: "./src/page.js"
+    pageworker: "./src/perspectives-pageworker.js"
   },
   output: {
-    library: 'perspectives-[name]',
-    filename: 'perspectives-[name].js',
-    path: path.join(__dirname, "dist"),
-    libraryTarget: "umd"
+    library: {
+      type: "module",
+    },
+    filename: 'perspectives-pageworker.js',
+    path: new URL("dist", import.meta.url).pathname,
+    chunkFormat: "module",
+  },
+  experiments: {
+    outputModule: true
   },
   watch: false,
   mode: "development",
   target: "webworker",
-  resolve: {
-      alias: {
-        sharedworker: path.resolve(__dirname, 'node_modules/perspectives-sharedworker/dist')
-      },
-    },
   module: {
     rules: [{
         test: /.js?$/,
@@ -34,25 +35,15 @@ module.exports = {
         ]
       }]
   },
-  externals: {
-    // These are Affjax dependencies when running on node.
-    // "xhr2-cookies": {
-    //   commonjs: "xhr2-cookies",
-    //   commonjs2: "xhr2-cookies",
-    //   amd: "xhr2-cookies",
-    //   root: "xhr2-cookies"
-    // },
-    // "url": {
-    //   commonjs: "url",
-    //   commonjs2: "url",
-    //   amd: "url",
-    //   root: "url"
-    // },
-    "perspectives-core": {
-      commonjs: "perspectives-core",
-      commonjs2: "perspectives-core",
-      amd: "perspectives-core",
-      root: "perspectives-core"
-    }
-  }
+  plugins: [ 
+    new CopyPlugin({
+      patterns: [
+        {
+          from: new URL("src/perspectives-pageworker.d.ts", import.meta.url).pathname,
+          to: new URL("dist/perspectives-pageworker.d.ts", import.meta.url).pathname
+        }
+      ],
+      }),
+    new CleanWebpackPlugin(), // Plugin to clear out the output directory  
+  ]
 };
